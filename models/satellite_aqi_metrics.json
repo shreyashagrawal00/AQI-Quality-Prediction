@@ -1,0 +1,16 @@
+{
+  "MAE": 83.2501466341261,
+  "RMSE": 122.29368921181545,
+  "R2": -0.044646793111896343,
+  "n_train": 728,
+  "n_test": 183,
+  "model": "XGBRegressor",
+  "features": [
+    "satellite_aod",
+    "satellite_no2",
+    "satellite_co",
+    "Month"
+  ],
+  "note": "Trained on satellite features ONLY (no ground pollutant readings) so it can estimate AQI anywhere with satellite coverage, not just at CPCB station cities. Expect lower accuracy than models/aqi_model.pkl.",
+  "satellite_source": "simulated"
+}

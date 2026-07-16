@@ -1,0 +1,16 @@
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+xgboost>=2.0
+streamlit>=1.32
+plotly>=5.20
+joblib>=1.3
+
+# Optional, only needed for LIVE satellite data (both the HCHO hotspot
+# page and the satellite_aod/no2/co AQI features fall back to a clearly
+# labeled simulated grid without this installed + authenticated):
+earthengine-api>=0.1.400
+
+# Optional -- lets EE_PROJECT/etc. be read from a .env file instead of
+# having to `set`/`export` them in every new terminal session:
+python-dotenv>=1.0

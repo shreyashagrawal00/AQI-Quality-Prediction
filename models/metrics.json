@@ -1,0 +1,9 @@
+{
+  "MAE": 20.84447051572128,
+  "RMSE": 40.42976399446848,
+  "R2": 0.9107332244210431,
+  "n_train": 19880,
+  "n_test": 4970,
+  "model": "XGBRegressor",
+  "used_satellite_features": true
+}
