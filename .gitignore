@@ -92,6 +92,10 @@ dist/
 data/raw/
 data/processed/
 data/final/
+data/city_hour.csv
+data/station_day.csv
+data/station_hour.csv
+
 
 # If you want to keep folder structure
 !data/raw/.gitkeep
@@ -121,8 +125,8 @@ data/final/
 # ==========================================
 ehthumbs.db
 
-data/
-*.csv
+# data/
+# *.csv
 *.zip
-*.pkl
+# *.pkl
 *.joblib
