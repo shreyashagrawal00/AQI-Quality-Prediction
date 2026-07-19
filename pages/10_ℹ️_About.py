@@ -9,18 +9,13 @@ import pandas as pd
 import streamlit as st
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "src"))
+from _theme import inject_dark_css
 
 DATA_DIR  = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models")
 
 st.set_page_config(page_title="About", page_icon="ℹ️", layout="wide")
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+inject_dark_css()
 
 st.title("ℹ️ About this Platform")
 st.markdown(

@@ -17,15 +17,10 @@ from firms_fire import get_fire_data, fire_density_grid, fire_statistics, SATELL
 from hcho_hotspots import india_grid, simulate_hcho_timeseries
 from satellite_features import init_earth_engine, get_ee_last_error
 from hcho_hotspots import get_hcho_grid_timeseries
+from _theme import inject_dark_css, plotly_dark_layout
 
 st.set_page_config(page_title="Biomass Burning", page_icon="🔥", layout="wide")
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+inject_dark_css()
 
 
 @st.cache_resource(show_spinner=False)
@@ -122,7 +117,9 @@ with tab1:
         fig.update_layout(
             mapbox_style="carto-darkmatter",
             mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
-            height=580, margin=dict(l=0,r=0,t=0,b=0),
+            height=580, margin=dict(l=0,r=0,t=30,b=0),
+            paper_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#e2e8f0"),
             title=f"Active Fire Detections ({days_back}-day window)",
         )
         st.plotly_chart(fig, use_container_width=True)
@@ -176,10 +173,13 @@ with tab2:
             name="🔴 HCHO + Fire Hotspot",
         ))
     fig2.update_layout(
-        mapbox_style="carto-positron",
+        mapbox_style="carto-darkmatter",
         mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
-        height=580, margin=dict(l=0,r=0,t=0,b=0),
-        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        height=580, margin=dict(l=0,r=0,t=30,b=0),
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01,
+                    bgcolor="rgba(26,26,46,0.9)", bordercolor="#2d2d44", font=dict(color="#e2e8f0")),
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#e2e8f0"),
         title="Biomass Burning Hotspot: High HCHO + Active Fire",
     )
     st.plotly_chart(fig2, use_container_width=True)
@@ -192,7 +192,7 @@ with tab3:
             fig3a = px.histogram(fire_df, x="frp", nbins=40,
                                  title="Fire Radiative Power (FRP) Distribution",
                                  color_discrete_sequence=["#f97316"])
-            fig3a.update_layout(height=300, plot_bgcolor="rgba(0,0,0,0)")
+            fig3a.update_layout(height=300, **plotly_dark_layout())
             st.plotly_chart(fig3a, use_container_width=True)
 
         with col2:
@@ -202,7 +202,7 @@ with tab3:
             fig3b = px.pie(conf_counts, names="Confidence", values="Count",
                            title="Fire Detection Confidence",
                            color_discrete_sequence=px.colors.sequential.Oranges)
-            fig3b.update_layout(height=300)
+            fig3b.update_layout(height=300, **plotly_dark_layout())
             st.plotly_chart(fig3b, use_container_width=True)
 
         # Daily fire count
@@ -212,7 +212,7 @@ with tab3:
         fig3c = px.bar(daily, x="acq_date", y="count",
                        title="Daily Active Fire Count",
                        color_discrete_sequence=["#ef4444"])
-        fig3c.update_layout(height=280, plot_bgcolor="rgba(0,0,0,0)")
+        fig3c.update_layout(height=280, **plotly_dark_layout())
         st.plotly_chart(fig3c, use_container_width=True)
 
 with tab4:

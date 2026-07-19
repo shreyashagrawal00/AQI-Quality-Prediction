@@ -21,6 +21,12 @@ ENV/
 !.env.example
 
 # ==========================================
+# Streamlit secrets (never commit real keys)
+# ==========================================
+.streamlit/secrets.toml
+
+
+# ==========================================
 # Jupyter
 # ==========================================
 .ipynb_checkpoints/

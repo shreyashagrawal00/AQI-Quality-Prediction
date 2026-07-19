@@ -14,17 +14,12 @@ import streamlit as st
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "src"))
+from _theme import inject_dark_css, plotly_dark_layout
 
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models")
 
 st.set_page_config(page_title="Model Validation", page_icon="✅", layout="wide")
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+inject_dark_css()
 
 
 def _mape(y_true, y_pred):
@@ -118,8 +113,8 @@ with tab1:
         title=f"Actual vs Predicted AQI (n={len(y_test):,})",
         xaxis_title="Actual AQI (CPCB Ground Truth)",
         yaxis_title="Predicted AQI (Model)",
-        height=520, plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(gridcolor="#e5e7eb"), yaxis=dict(gridcolor="#e5e7eb"),
+        height=520,
+        **plotly_dark_layout(),
     )
     st.plotly_chart(fig1, use_container_width=True)
 
@@ -142,8 +137,8 @@ with tab2:
     fig2.update_layout(
         title="Residual Plot (Predicted − Actual)",
         xaxis_title="Actual AQI", yaxis_title="Residual",
-        height=450, plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(gridcolor="#e5e7eb"), yaxis=dict(gridcolor="#e5e7eb"),
+        height=450,
+        **plotly_dark_layout(),
     )
     st.plotly_chart(fig2, use_container_width=True)
 
@@ -156,7 +151,7 @@ with tab3:
                              color_discrete_sequence=["#3b82f6"])
         fig3a.add_vline(x=mae, line_dash="dash", line_color="#ef4444",
                         annotation_text=f"MAE={mae:.1f}")
-        fig3a.update_layout(height=350, plot_bgcolor="rgba(0,0,0,0)", showlegend=False)
+        fig3a.update_layout(height=350, showlegend=False, **plotly_dark_layout())
         st.plotly_chart(fig3a, use_container_width=True)
 
     with col_b:
@@ -164,8 +159,8 @@ with tab3:
                              title="Residual Distribution",
                              labels={"value": "Residual (Pred − Actual)"},
                              color_discrete_sequence=["#8b5cf6"])
-        fig3b.add_vline(x=0, line_dash="dash", line_color="#374151")
-        fig3b.update_layout(height=350, plot_bgcolor="rgba(0,0,0,0)", showlegend=False)
+        fig3b.add_vline(x=0, line_dash="dash", line_color="#64748b")
+        fig3b.update_layout(height=350, showlegend=False, **plotly_dark_layout())
         st.plotly_chart(fig3b, use_container_width=True)
 
     # Scientific statistics
@@ -202,7 +197,7 @@ with tab4:
                           color_continuous_scale="RdYlGn_r",
                           title="Model Comparison by RMSE",
                           text=cmp_df["RMSE"].round(2))
-            fig4.update_layout(height=350, plot_bgcolor="rgba(0,0,0,0)")
+            fig4.update_layout(height=350, **plotly_dark_layout())
             st.plotly_chart(fig4, use_container_width=True)
     else:
         st.info("Run `python src/multi_model.py` for multi-model comparison.")
@@ -222,6 +217,6 @@ with tab5:
                   color="Mean Abs Error", color_continuous_scale="YlOrRd",
                   text=cat_err_grp["Mean Abs Error"].round(1),
                   title="Mean Absolute Error by AQI Category")
-    fig5.update_layout(height=380, plot_bgcolor="rgba(0,0,0,0)")
+    fig5.update_layout(height=380, **plotly_dark_layout())
     st.plotly_chart(fig5, use_container_width=True)
     st.dataframe(cat_err_grp, use_container_width=True, hide_index=True)

@@ -19,19 +19,28 @@ from state_rankings import (
     load_state_map, rank_states_by_aqi, rank_states_by_hcho,
     rank_states_by_fire, most_improved_states,
 )
+from _theme import inject_dark_css, plotly_dark_layout
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 
 st.set_page_config(page_title="State Rankings", page_icon="🏆", layout="wide")
-
+inject_dark_css()
+# Extra rank card CSS on top of dark theme
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
 .rank-card {
-  background:linear-gradient(135deg,#1e3a8a,#1e40af);
-  border-radius:12px;padding:1rem;color:white;text-align:center;
-  box-shadow:0 4px 15px rgba(30,58,138,.3);margin-bottom:0.5rem;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 1px solid #2d2d44;
+  border-radius: 14px; padding: 1rem; color: white;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  margin-bottom: 0.5rem;
+  position: relative; overflow: hidden;
+}
+.rank-card::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4ff, #3b82f6);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -85,7 +94,7 @@ with tab1:
         labels={"AQI_mean": "Mean AQI"},
         height=max(350, top_n * 28),
     )
-    fig1.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
+    fig1.update_layout(**plotly_dark_layout(height=max(350, top_n * 28)))
     st.plotly_chart(fig1, use_container_width=True)
     st.dataframe(worst.style.background_gradient(subset=["AQI_mean"], cmap="YlOrRd"),
                  use_container_width=True, hide_index=True)
@@ -105,7 +114,7 @@ with tab2:
         labels={"AQI_mean": "Mean AQI"},
         height=450,
     )
-    fig2.update_layout(plot_bgcolor="rgba(0,0,0,0)")
+    fig2.update_layout(**plotly_dark_layout(height=450))
     st.plotly_chart(fig2, use_container_width=True)
     st.dataframe(cleanest, use_container_width=True, hide_index=True)
 
@@ -127,7 +136,7 @@ with tab3:
         title=f"States Ranked by Mean HCHO (×10¹⁶ molec/cm²) — {hcho_year_sel}",
         height=450,
     )
-    fig3.update_layout(plot_bgcolor="rgba(0,0,0,0)")
+    fig3.update_layout(**plotly_dark_layout(height=450))
     st.plotly_chart(fig3, use_container_width=True)
     st.dataframe(hcho_rank, use_container_width=True, hide_index=True)
 
@@ -151,7 +160,7 @@ with tab4:
             title="States Ranked by Fire Count (7-day window)",
             height=420,
         )
-        fig4a.update_layout(plot_bgcolor="rgba(0,0,0,0)")
+        fig4a.update_layout(**plotly_dark_layout(height=420))
         st.plotly_chart(fig4a, use_container_width=True)
 
         fig4b = px.bar(
@@ -161,7 +170,7 @@ with tab4:
             title="States Ranked by Total FRP (MW)",
             height=420,
         )
-        fig4b.update_layout(plot_bgcolor="rgba(0,0,0,0)")
+        fig4b.update_layout(**plotly_dark_layout(height=420))
         st.plotly_chart(fig4b, use_container_width=True)
         st.dataframe(fire_rank, use_container_width=True, hide_index=True)
 
@@ -185,6 +194,6 @@ with tab5:
             labels={"improvement": "AQI Improvement"},
             height=450,
         )
-        fig5.update_layout(plot_bgcolor="rgba(0,0,0,0)")
+        fig5.update_layout(**plotly_dark_layout(height=450))
         st.plotly_chart(fig5, use_container_width=True)
         st.dataframe(improved, use_container_width=True, hide_index=True)

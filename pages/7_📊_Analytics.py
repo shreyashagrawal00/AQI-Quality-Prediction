@@ -13,17 +13,12 @@ import streamlit as st
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "src"))
 from data_preprocessing import load_city_data, add_time_features
+from _theme import inject_dark_css, plotly_dark_layout
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 
 st.set_page_config(page_title="Analytics", page_icon="📊", layout="wide")
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+inject_dark_css()
 
 
 @st.cache_data(show_spinner="Loading data…")
@@ -62,7 +57,9 @@ with tab1:
             title="Pearson Correlation Heatmap",
         )
         fig1.update_traces(textfont_size=10)
-        fig1.update_layout(height=600, margin=dict(l=0,r=0,t=40,b=0))
+        fig1.update_layout(height=600, margin=dict(l=0, r=0, t=40, b=0),
+                           paper_bgcolor="rgba(0,0,0,0)",
+                           font=dict(color="#e2e8f0"))
         st.plotly_chart(fig1, use_container_width=True)
 
         # Top correlations with AQI
@@ -107,7 +104,7 @@ with tab2:
         title=f"{y_col} vs {x_col}",
         height=480,
     )
-    fig2.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
+    fig2.update_layout(**plotly_dark_layout())
     st.plotly_chart(fig2, use_container_width=True)
 
     # Pearson for this pair
@@ -129,7 +126,7 @@ with tab2:
                                title=f"AQI vs {pc} (r={r_q:.3f})",
                                color_discrete_sequence=["#3b82f6"])
             fig_q.update_layout(height=280, margin=dict(l=10,r=10,t=40,b=10),
-                                 plot_bgcolor="rgba(0,0,0,0)")
+                                **plotly_dark_layout())
             cols_q[j].plotly_chart(fig_q, use_container_width=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -153,7 +150,7 @@ with tab3:
         fig3 = px.violin(melt_df, x="Pollutant", y="Value", box=True,
                          color="Pollutant", title="Pollutant Distributions",
                          color_discrete_sequence=px.colors.qualitative.Set2)
-        fig3.update_layout(height=450, showlegend=False, plot_bgcolor="rgba(0,0,0,0)")
+        fig3.update_layout(height=450, showlegend=False, **plotly_dark_layout())
         st.plotly_chart(fig3, use_container_width=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -175,7 +172,7 @@ with tab4:
                       title="Top 20 Feature Importances (Model)",
                       text=imp_df.tail(20)["Importance %"].apply(lambda v: f"{v:.1f}%"),
                       height=550)
-        fig4.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
+        fig4.update_layout(**plotly_dark_layout())
         st.plotly_chart(fig4, use_container_width=True)
 
         st.dataframe(imp_df.sort_values("Importance", ascending=False), use_container_width=True, hide_index=True)

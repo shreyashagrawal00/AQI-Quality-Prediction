@@ -19,18 +19,13 @@ from satellite_features import init_earth_engine, get_satellite_features_for_poi
 from city_coordinates import get_coordinates
 from health_advisory import aqi_to_category, get_advisory
 from shap_explainer import shap_available, shap_waterfall_data, explain_prediction
+from _theme import inject_dark_css, plotly_dark_layout
 
 DATA_DIR  = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models")
 
 st.set_page_config(page_title="AQI Prediction", page_icon="🔮", layout="wide")
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+inject_dark_css()
 
 
 @st.cache_data(show_spinner="Loading ground data…")
@@ -167,13 +162,15 @@ if predict_btn:
         color = adv["color"]
         bg    = adv["bg_color"]
         st.markdown(
-            f"<div style='padding:1.5rem;border-radius:12px;background:{bg};"
-            f"border:3px solid {color};text-align:center'>"
-            f"<div style='font-size:3rem'>{adv['icon']}</div>"
-            f"<h1 style='margin:0;color:{color}'>{pred:.0f}</h1>"
-            f"<h3 style='color:{color};margin-top:0.2rem'>{category}</h3>"
-            f"<p style='color:#555;margin-top:0.5rem'>{adv['effects'][0]}</p>"
-            f"<small style='color:#888'>Model: {model_choice} "
+            f"<div style='padding:1.5rem;border-radius:14px;"
+            f"background:linear-gradient(135deg,#1a1a2e,#16213e);"
+            f"border:2px solid {color}88;text-align:center;"
+            f"box-shadow:0 8px 32px {color}22'>"
+            f"<div style='font-size:3.5rem;margin-bottom:0.3rem'>{adv['icon']}</div>"
+            f"<h1 style='margin:0;color:{color};font-size:3rem'>{pred:.0f}</h1>"
+            f"<h3 style='color:{color};margin-top:0.2rem;opacity:0.9'>{category}</h3>"
+            f"<p style='color:#94a3b8;margin-top:0.5rem;font-size:0.9rem'>{adv['effects'][0]}</p>"
+            f"<small style='color:#64748b'>Model: {model_choice} "
             f"| Satellite: {sat_source}</small>"
             f"</div>",
             unsafe_allow_html=True,
@@ -213,8 +210,11 @@ if predict_btn:
             },
             number={"font": {"color": color, "size": 48}},
         ))
-        fig_gauge.update_layout(height=320, margin=dict(l=20,r=20,t=40,b=0),
-                                paper_bgcolor="rgba(0,0,0,0)")
+        fig_gauge.update_layout(
+            height=320, margin=dict(l=20, r=20, t=40, b=0),
+            paper_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#e2e8f0"),
+        )
         st.plotly_chart(fig_gauge, use_container_width=True)
 
     # ── SHAP Explainability ───────────────────────────────────────────────────
@@ -237,8 +237,10 @@ if predict_btn:
                     height=320,
                 )
                 fig_shap.update_layout(
-                    plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-                    showlegend=True, legend=dict(orientation="h", y=-0.2),
+                    **plotly_dark_layout(
+                        showlegend=True,
+                        legend=dict(orientation="h", y=-0.2, bgcolor="rgba(26,26,46,0.9)", bordercolor="#2d2d44"),
+                    )
                 )
                 st.plotly_chart(fig_shap, use_container_width=True)
             else:
@@ -277,11 +279,8 @@ if predict_btn:
                 title=f"7-Day AQI Forecast for {city}",
                 xaxis_title="Date",
                 yaxis_title="AQI",
-                plot_bgcolor="rgba(0,0,0,0)",
-                paper_bgcolor="rgba(0,0,0,0)",
-                yaxis=dict(gridcolor="#e5e7eb"),
-                xaxis=dict(gridcolor="#e5e7eb"),
                 height=350,
+                **plotly_dark_layout(),
             )
             st.plotly_chart(fig_fc, use_container_width=True)
         with c_fc2:

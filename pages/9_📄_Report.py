@@ -23,12 +23,9 @@ MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models")
 
 st.set_page_config(page_title="Report Generator", page_icon="📄", layout="wide")
 
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "src"))
+from _theme import inject_dark_css, plotly_dark_layout
+inject_dark_css()
 
 
 @st.cache_data(show_spinner="Loading data…")
@@ -107,7 +104,7 @@ if incl_trend:
     fig_trend = px.line(monthly, x="Month_Name", y="AQI", markers=True,
                         title=f"Monthly Mean AQI — {year_sel}",
                         color_discrete_sequence=["#3b82f6"])
-    fig_trend.update_layout(height=350, plot_bgcolor="rgba(0,0,0,0)")
+    fig_trend.update_layout(**plotly_dark_layout(height=350))
     st.plotly_chart(fig_trend, use_container_width=True)
     figs_for_report.append((fig_trend, f"Monthly Mean AQI — {year_sel}"))
 
@@ -116,7 +113,7 @@ if incl_city:
     fig_city = px.bar(city_avg, x="AQI", y="City", orientation="h",
                       color="AQI", color_continuous_scale="YlOrRd",
                       title=f"Top 15 Most Polluted Cities — {year_sel}", height=400)
-    fig_city.update_layout(plot_bgcolor="rgba(0,0,0,0)")
+    fig_city.update_layout(**plotly_dark_layout())
     st.plotly_chart(fig_city, use_container_width=True)
     figs_for_report.append((fig_city, f"Top 15 Polluted Cities — {year_sel}"))
 
@@ -126,7 +123,7 @@ if incl_state:
         fig_state = px.bar(state_rank, x="AQI_mean", y="State", orientation="h",
                            color="AQI_mean", color_continuous_scale="YlOrRd",
                            title=f"States by Mean AQI — {year_sel}", height=400)
-        fig_state.update_layout(plot_bgcolor="rgba(0,0,0,0)")
+        fig_state.update_layout(**plotly_dark_layout())
         st.plotly_chart(fig_state, use_container_width=True)
         figs_for_report.append((fig_state, f"State AQI Rankings — {year_sel}"))
 

@@ -16,17 +16,12 @@ from satellite_features import init_earth_engine, get_ee_last_error, build_grid_
 from hcho_hotspots import india_grid
 from health_advisory import aqi_to_category, get_advisory
 from state_rankings import _latlon_to_state
+from _theme import inject_dark_css, plotly_dark_layout
 
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models")
 
 st.set_page_config(page_title="India AQI Map", page_icon="🗺️", layout="wide")
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+inject_dark_css()
 
 
 @st.cache_resource(show_spinner=False)
@@ -61,7 +56,7 @@ if model is None:
 
 ee_ready = get_ee_status()
 
-# ── Controls ─────────────────────────────────────────────────────────────────
+# ── Controls ──────────────────────────────────────────────────────────────────
 col1, col2, col3, col4 = st.columns(4)
 with col1:
     year = st.number_input("Year", min_value=2018, max_value=2026, value=2020, key="aqi_map_yr")
@@ -72,7 +67,7 @@ with col2:
 with col3:
     resolution = st.radio("Grid Resolution", ["0.25° (Fast)", "0.1° (High-Res ⚠️)"], horizontal=True)
 with col4:
-    map_style = st.selectbox("Map Style", ["carto-positron", "open-street-map", "carto-darkmatter"])
+    map_style = st.selectbox("Map Style", ["carto-darkmatter", "carto-positron", "open-street-map"])
 
 if "High-Res" in resolution:
     st.warning("⚠️ 0.1° resolution generates ~77,000 grid points. Live EE mode will take several minutes. Recommended only in simulated mode.")
@@ -103,7 +98,7 @@ is_live = (sat_grid["_source"] == "live").all()
 source_note = "🟢 Live Sentinel-5P + MODIS pixels" if is_live else "🟡 Simulated satellite data (EE not authenticated)"
 st.caption(source_note)
 
-# ── Summary Metrics ───────────────────────────────────────────────────────────
+# ── Summary Metrics ────────────────────────────────────────────────────────────
 m1, m2, m3, m4, m5 = st.columns(5)
 m1.metric("Mean AQI", f"{sat_grid['predicted_aqi'].mean():.0f}")
 m2.metric("Max AQI",  f"{sat_grid['predicted_aqi'].max():.0f}")
@@ -112,21 +107,26 @@ m4.metric("Grid Points", f"{len(sat_grid):,}")
 worst_cat = aqi_to_category(sat_grid["predicted_aqi"].max())
 m5.metric("Worst Category", worst_cat)
 
-# ── Map ───────────────────────────────────────────────────────────────────────
+# ── Map ────────────────────────────────────────────────────────────────────────
 tab1, tab2 = st.tabs(["🌡️ Density Heatmap", "📊 Scatter Map"])
 
 with tab1:
     fig = go.Figure(data=go.Densitymapbox(
         lat=sat_grid["lat"], lon=sat_grid["lon"], z=sat_grid["predicted_aqi"],
         radius=20, colorscale="YlOrRd", zmin=0, zmax=400,
-        colorbar=dict(title="AQI", tickvals=[0,50,100,200,300,400],
-                      ticktext=["0","50<br>Good","100<br>Satisf.","200<br>Mod","300<br>Poor","400<br>V.Poor"]),
+        colorbar=dict(
+            title="AQI", tickvals=[0, 50, 100, 200, 300, 400],
+            ticktext=["0", "50<br>Good", "100<br>Satisf.", "200<br>Mod", "300<br>Poor", "400<br>V.Poor"],
+            bgcolor="rgba(26,26,46,0.9)", bordercolor="#2d2d44",
+            tickfont=dict(color="#e2e8f0"), title_font=dict(color="#e2e8f0"),
+        ),
         hovertemplate="Lat: %{lat:.2f}<br>Lon: %{lon:.2f}<br>AQI: %{z:.0f}<extra></extra>",
     ))
     fig.update_layout(
         mapbox_style=map_style,
         mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
-        height=600, margin=dict(l=0, r=0, t=0, b=0),
+        height=620, margin=dict(l=0, r=0, t=0, b=0),
+        paper_bgcolor="rgba(0,0,0,0)",
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -137,12 +137,15 @@ with tab2:
         color_continuous_scale="YlOrRd",
         hover_data={"predicted_aqi": ":.0f", "category": True},
         zoom=3.8, center={"lat": 22, "lon": 82},
-        height=600,
+        height=620,
     )
-    fig2.update_layout(mapbox_style=map_style, margin=dict(l=0,r=0,t=0,b=0))
+    fig2.update_layout(
+        mapbox_style=map_style, margin=dict(l=0, r=0, t=0, b=0),
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
     st.plotly_chart(fig2, use_container_width=True)
 
-# ── AQI Distribution ─────────────────────────────────────────────────────────
+# ── AQI Distribution ──────────────────────────────────────────────────────────
 st.subheader("AQI Distribution across Grid")
 cat_counts = sat_grid["category"].value_counts().reset_index()
 cat_counts.columns = ["Category", "Count"]
@@ -152,11 +155,11 @@ fig3 = px.bar(cat_counts, x="Category", y="Count", color="Category",
               color_discrete_map=color_map,
               title="Grid Points by AQI Category",
               category_orders={"Category": cat_order})
-fig3.update_layout(showlegend=False, height=300,
-                   plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
+fig3.update_layout(showlegend=False, height=320,
+                   **plotly_dark_layout())
 st.plotly_chart(fig3, use_container_width=True)
 
-# ── Download ──────────────────────────────────────────────────────────────────
+# ── Download ───────────────────────────────────────────────────────────────────
 with st.expander("📥 Download Grid Data"):
     csv = sat_grid[["lat", "lon", "predicted_aqi", "category", "_source"]].to_csv(index=False)
     st.download_button("Download CSV", csv, "india_aqi_grid.csv", "text/csv")

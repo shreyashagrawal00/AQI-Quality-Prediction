@@ -18,15 +18,10 @@ from hcho_hotspots import (
 )
 from satellite_features import init_earth_engine, get_ee_last_error
 from state_rankings import rank_states_by_hcho
+from _theme import inject_dark_css, plotly_dark_layout
 
 st.set_page_config(page_title="HCHO Hotspots", page_icon="🌡️", layout="wide")
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+inject_dark_css()
 
 
 @st.cache_resource(show_spinner=False)
@@ -100,10 +95,12 @@ with tab1:
             hovertemplate="Lat: %{lat:.2f}<br>Lon: %{lon:.2f}<br>HCHO: %{z:.3f}<extra></extra>",
         ))
         fig.update_layout(
-            mapbox_style="carto-positron",
+            mapbox_style="carto-darkmatter",
             mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
-            height=550, margin=dict(l=0,r=0,t=0,b=0),
+            height=580, margin=dict(l=0,r=0,t=30,b=0),
+            paper_bgcolor="rgba(0,0,0,0)",
             title=f"HCHO Column Density — {pd.Timestamp(2000, month_sel, 1).strftime('%B')} {year}",
+            title_font=dict(color="#e2e8f0"),
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -158,11 +155,14 @@ with tab2:
         hovertemplate="z=%.2f<extra>Hotspot</extra>",
     ))
     fig2.update_layout(
-        mapbox_style="carto-positron",
+        mapbox_style="carto-darkmatter",
         mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
-        height=550, margin=dict(l=0,r=0,t=0,b=0),
-        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        height=580, margin=dict(l=0,r=0,t=30,b=0),
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01,
+                    bgcolor="rgba(26,26,46,0.9)", bordercolor="#2d2d44"),
+        paper_bgcolor="rgba(0,0,0,0)",
         title=f"Biomass-Burning HCHO Anomalies — {year}",
+        title_font=dict(color="#e2e8f0"),
     )
     st.plotly_chart(fig2, use_container_width=True)
 
@@ -195,7 +195,7 @@ with tab3:
         labels={"mean_hcho": "Mean HCHO (×10¹⁶ molec/cm²)"},
         height=500,
     )
-    fig3.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
+    fig3.update_layout(**plotly_dark_layout())
     st.plotly_chart(fig3, use_container_width=True)
     st.dataframe(state_rank, use_container_width=True, hide_index=True)
 

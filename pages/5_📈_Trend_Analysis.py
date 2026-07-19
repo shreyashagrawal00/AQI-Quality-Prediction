@@ -14,17 +14,12 @@ import streamlit as st
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "src"))
 from data_preprocessing import load_city_data, add_time_features
 from health_advisory import aqi_to_category, get_advisory
+from _theme import inject_dark_css, plotly_dark_layout
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 
 st.set_page_config(page_title="Trend Analysis", page_icon="📈", layout="wide")
-
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-html,body,[class*="css"]{font-family:'Inter',sans-serif;}
-</style>
-""", unsafe_allow_html=True)
+inject_dark_css()
 
 
 @st.cache_data(show_spinner="Loading data…")
@@ -91,8 +86,10 @@ with tab1:
                 fig.add_hrect(y0=low, y1=high, fillcolor=color, line_width=0,
                               annotation_text=label, annotation_position="right")
 
-        fig.update_layout(height=450, plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-                          yaxis=dict(gridcolor="#e5e7eb"), xaxis=dict(gridcolor="#e5e7eb"))
+        fig.update_layout(
+            height=450,
+            **plotly_dark_layout(),
+        )
         st.plotly_chart(fig, use_container_width=True)
 
         # Rolling average option
@@ -105,7 +102,7 @@ with tab1:
                                       mode="lines", line=dict(color="#93c5fd", width=1), name="Daily"))
             fig2.add_trace(go.Scatter(x=nat_trend2["Date"], y=nat_trend2["rolling"],
                                       mode="lines", line=dict(color="#1d4ed8", width=2.5), name="30-day avg"))
-            fig2.update_layout(height=300, plot_bgcolor="rgba(0,0,0,0)")
+            fig2.update_layout(height=300, **plotly_dark_layout())
             st.plotly_chart(fig2, use_container_width=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -130,8 +127,8 @@ with tab2:
     ))
     fig_m.update_layout(
         title=f"Monthly Seasonality — {pollutant}",
-        height=400, plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-        yaxis=dict(gridcolor="#e5e7eb"),
+        height=400,
+        **plotly_dark_layout(),
     )
     st.plotly_chart(fig_m, use_container_width=True)
 
@@ -147,7 +144,7 @@ with tab2:
                    title=f"Seasonal Distribution — {pollutant}",
                    category_orders={"Season": ["Winter","Pre-Monsoon","Monsoon","Post-Monsoon"]},
                    color_discrete_sequence=["#3b82f6","#f59e0b","#10b981","#ef4444"])
-    fig_s.update_layout(height=380, plot_bgcolor="rgba(0,0,0,0)", showlegend=False)
+    fig_s.update_layout(height=380, **plotly_dark_layout(showlegend=False))
     st.plotly_chart(fig_s, use_container_width=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -171,9 +168,8 @@ with tab3:
                                name="Median"))
     fig_y.update_layout(
         title=f"Year-over-Year Trend — {pollutant}",
-        height=420, plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(dtick=1, gridcolor="#e5e7eb"),
-        yaxis=dict(gridcolor="#e5e7eb"),
+        height=420,
+        **plotly_dark_layout(),
     )
     st.plotly_chart(fig_y, use_container_width=True)
     st.dataframe(yearly.set_index("Year").style.background_gradient(subset=["mean"], cmap="YlOrRd"),
@@ -204,7 +200,8 @@ with tab4:
         fig_cmp.update_layout(
             barmode="group",
             title=f"Monthly {pollutant}: {yr_a} vs {yr_b}",
-            height=400, plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+            height=400,
+            **plotly_dark_layout(),
         )
         st.plotly_chart(fig_cmp, use_container_width=True)
 

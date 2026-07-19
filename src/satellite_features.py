@@ -49,6 +49,18 @@ try:
 except ImportError:
     pass  # python-dotenv not installed -- fall back to whatever's already in the shell env
 
+# ── Streamlit Cloud secrets support ─────────────────────────────────────────
+# On Streamlit Cloud, secrets defined in Settings → Secrets are available via
+# st.secrets. We mirror them into os.environ so the rest of the code (which
+# uses os.environ.get()) works unchanged in both local and cloud environments.
+try:
+    import streamlit as st
+    for _key in ("EE_PROJECT", "EE_SERVICE_ACCOUNT", "EE_SERVICE_ACCOUNT_KEY", "FIRMS_MAP_KEY"):
+        if _key in st.secrets and _key not in os.environ:
+            os.environ[_key] = st.secrets[_key]
+except Exception:
+    pass  # Not running in Streamlit, or secrets not configured -- that's fine
+
 SATELLITE_FEATURE_COLS = ["satellite_aod", "satellite_no2", "satellite_co"]
 
 _EE_READY = False
