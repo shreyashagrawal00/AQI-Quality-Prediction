@@ -205,22 +205,80 @@ def build_grid_satellite_table(
               "falling back to simulate_satellite_grid_row().")
         use_live = False
 
-    rows = []
-    for row in grid.itertuples():
-        if use_live:
-            try:
-                feats = get_satellite_features_for_point(row.lat, row.lon, _dt.date(year, month, 1))
-                feats["_source"] = "live"
-            except Exception as exc:
-                print(f"[WARN] live fetch failed for ({row.lat:.2f},{row.lon:.2f}) "
-                      f"{year}-{month:02d} ({exc}); using simulated value.")
-                feats = simulate_satellite_grid_row(row.lat, row.lon, year, month)
-                feats["_source"] = "simulated"
-        else:
+    if not use_live:
+        rows = []
+        for row in grid.itertuples():
             feats = simulate_satellite_grid_row(row.lat, row.lon, year, month)
             feats["_source"] = "simulated"
-        rows.append({"lat": row.lat, "lon": row.lon, **feats})
-    return pd.DataFrame(rows)
+            rows.append({"lat": row.lat, "lon": row.lon, **feats})
+        return pd.DataFrame(rows)
+
+    try:
+        import ee
+        start_date = _dt.date(year, month, 1)
+        start, end = _monthly_window(start_date)
+
+        # Build combined multi-band image for the month
+        aod_img = ee.ImageCollection("MODIS/061/MCD19A2_GRANULES").filterDate(start, end).select("Optical_Depth_047").mean()
+        no2_img = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_NO2").filterDate(start, end).select("tropospheric_NO2_column_number_density").mean()
+        co_img  = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_CO").filterDate(start, end).select("CO_column_number_density").mean()
+        combined_img = aod_img.addBands(no2_img).addBands(co_img)
+
+        # Batch FeatureCollection of points
+        features = []
+        for i, row in enumerate(grid.itertuples()):
+            features.append(ee.Feature(
+                ee.Geometry.Point([row.lon, row.lat]),
+                {"lat": row.lat, "lon": row.lon, "grid_id": i}
+            ))
+        points = ee.FeatureCollection(features)
+
+        # Sample combined image at all points
+        sampled = combined_img.sampleRegions(collection=points, scale=5000, geometries=False).getInfo()
+
+        # Map results back by grid_id
+        sampled_dict = {}
+        for feat in sampled.get("features", []):
+            props = feat.get("properties", {})
+            grid_id = props.get("grid_id")
+            if grid_id is not None:
+                sampled_dict[grid_id] = {
+                    "satellite_aod": props.get("Optical_Depth_047"),
+                    "satellite_no2": props.get("tropospheric_NO2_column_number_density"),
+                    "satellite_co": props.get("CO_column_number_density"),
+                }
+
+        # Build final DataFrame
+        rows = []
+        for i, row in enumerate(grid.itertuples()):
+            val = sampled_dict.get(i)
+            if val and val.get("satellite_aod") is not None:
+                feats = {
+                    "satellite_aod": float(val["satellite_aod"]),
+                    "satellite_no2": float(val["satellite_no2"]) if val.get("satellite_no2") is not None else float("nan"),
+                    "satellite_co": float(val["satellite_co"]) if val.get("satellite_co") is not None else float("nan"),
+                    "_source": "live"
+                }
+            else:
+                feats = simulate_satellite_grid_row(row.lat, row.lon, year, month)
+                feats["_source"] = "simulated"
+            rows.append({"lat": row.lat, "lon": row.lon, **feats})
+
+        df = pd.DataFrame(rows)
+        # Impute missing values with column median
+        for c in ["satellite_aod", "satellite_no2", "satellite_co"]:
+            if c in df.columns:
+                df[c] = df[c].fillna(df[c].median())
+        return df
+
+    except Exception as exc:
+        print(f"[WARN] Live batch fetch failed: {exc}. Falling back to simulation.")
+        rows = []
+        for row in grid.itertuples():
+            feats = simulate_satellite_grid_row(row.lat, row.lon, year, month)
+            feats["_source"] = "simulated"
+            rows.append({"lat": row.lat, "lon": row.lon, **feats})
+        return pd.DataFrame(rows)
 
 
 def build_satellite_feature_table(

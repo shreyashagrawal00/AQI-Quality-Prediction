@@ -1,3 +1,4 @@
+# ── Core data / ML ────────────────────────────────────────────────────────────
 pandas>=2.0
 numpy>=1.24
 scikit-learn>=1.3
@@ -5,12 +6,26 @@ xgboost>=2.0
 streamlit>=1.32
 plotly>=5.20
 joblib>=1.3
+statsmodels>=0.14
 
-# Optional, only needed for LIVE satellite data (both the HCHO hotspot
-# page and the satellite_aod/no2/co AQI features fall back to a clearly
-# labeled simulated grid without this installed + authenticated):
+
+# ── Multi-model support (new) ─────────────────────────────────────────────────
+lightgbm>=4.0
+catboost>=1.2
+
+# ── Explainability (new) ──────────────────────────────────────────────────────
+shap>=0.44
+
+# ── PDF report generation (new) ───────────────────────────────────────────────
+fpdf2>=2.7
+kaleido>=0.2              # Plotly → PNG image export for PDF
+
+# ── NASA FIRMS fire data download (new) ──────────────────────────────────────
+requests>=2.31
+
+# ── Optional: satellite data (live mode) ─────────────────────────────────────
+# Requires `earthengine authenticate` + EE_PROJECT set in .env
 earthengine-api>=0.1.400
 
-# Optional -- lets EE_PROJECT/etc. be read from a .env file instead of
-# having to `set`/`export` them in every new terminal session:
+# ── Optional: .env file support ───────────────────────────────────────────────
 python-dotenv>=1.0

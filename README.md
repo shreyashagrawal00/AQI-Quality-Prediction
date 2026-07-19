@@ -1,180 +1,133 @@
-# Surface AQI Estimation & HCHO Hotspot Detection
+# Satellite-based Surface AQI & HCHO Hotspot Analysis Platform for India
 
-AI-powered system to predict AQI from CPCB ground-station data and
-visualize Sentinel-5P HCHO hotspots over India, per the project guide.
+An advanced, research-grade platform that combines satellite remote sensing, ground-station data, active fire detections, and machine learning to estimate surface Air Quality Index (AQI) and identify formaldehyde (HCHO) hotspots over the Indian landmass.
 
-## What was actually in the uploaded repo
+This project is aligned with the ISRO problem statement for satellite-derived surface AQI identification.
 
-The GitHub repo zip
-(`Development-of-surface-AQI-Identification-of-HCHO-Hotspots-over-India-using-Satellite-Data_-main.zip`)
-contained **only documentation** (`docs/*.md`) — most files were empty
-stubs, and there was **no source code at all**. So there was nothing to
-"fix" in the literal sense (no code ran, let alone had bugs); instead
-this delivers the implementation the docs describe, end to end, and I
-proactively avoided the specific bugs described below because they're
-the ones most first-pass attempts at this exact dataset hit.
+---
 
-## Project structure
+## 🚀 Key Features
+
+1. **India-wide Surface AQI Heatmap**
+   - Configurable grid (0.25° fast / 0.1° high-res) across the Indian mainland.
+   - Predictions generated using satellite features (MODIS AOD, Sentinel-5P NO₂/CO) to cover unmonitored regions.
+   - Interactive zoom/pan map using Plotly Mapbox.
+
+2. **NASA FIRMS Active Fire Integration**
+   - Live downloads of active fire points (VIIRS/MODIS) within the India bounding box using NASA's public CSV API.
+   - Real-time Fire Radiative Power (FRP) and daily fire count statistics.
+   - Simultaneous HCHO + Fire activity overlay map to isolate biomass-burning hotspots.
+
+3. **Formaldehyde (HCHO) Hotspot Analysis**
+   - S5P TROPOMI HCHO column densities via Google Earth Engine.
+   - Multi-resolution analysis: Daily, Weekly, Monthly, Seasonal, and Annual averages.
+   - Spatio-temporal anomaly detection (Z-score, standard deviation, percentile thresholding) comparing burning seasons against baseline months.
+
+4. **Explainable AI (SHAP)**
+   - Integrated SHAP (Shapley Additive exPlanations) values.
+   - Local waterfall charts: *"Why was this specific AQI predicted as 214?"*
+   - Global feature importance analysis (mean absolute SHAP).
+
+5. **Multi-Model Machine Learning**
+   - Automated training and evaluation of: Random Forest, XGBoost, LightGBM, and CatBoost.
+   - Metrics: Mean Absolute Error (MAE), Root Mean Squared Error (RMSE), R² Score, and Mean Absolute Percentage Error (MAPE).
+   - Auto-selection of the best performing model.
+
+6. **Model Validation & Scientific Analytics**
+   - CPCB actual vs. predicted AQI validation.
+   - Scatter plots with ±20% bands, residuals, error distributions, and per-category error.
+   - Scientific statistics (percentiles, bias) and Pearson correlation matrix for all pollutants.
+
+7. **7-Day AQI Forecasting**
+   - Autoregressive GBDT forecasting with lag features ($t-1$ to $t-7$) and rolling statistics.
+   - 1-day, 3-day, and 7-day horizons for any city with bootstrap-derived uncertainty bands.
+
+8. **State Rankings & Health Advisories**
+   - State-level rankings for: Worst AQI, Cleanest Air, Top HCHO, Highest Fire, and YoY Improved States.
+   - Detailed Indian CPCB health advisories with specific clinical effects and precautions.
+
+9. **Automatic PDF Report Generator**
+   - In-browser configurable PDF export powered by `fpdf2` and `kaleido`.
+   - Embeds metrics, tables, and Plotly maps/charts.
+
+---
+
+## 📁 Directory Structure
 
 ```
-aqi_project/
-├── app.py                     # Streamlit dashboard (6 pages, per the guide)
-├── requirements.txt
-├── data/                      # put city_day.csv, city_hour.csv, station_day.csv,
-│                               # station_hour.csv, stations.csv here (from archive.zip)
-│                               # satellite_features.csv is generated, not required upfront
-├── src/
-│   ├── aqi_utils.py             # CPCB AQI -> category/color/health-message
-│   ├── data_preprocessing.py    # load + clean city/station CSVs; attach_satellite_features()
-│   ├── feature_engineering.py   # build model-ready X/y (incl. optional satellite cols)
-│   ├── train_model.py           # trains + evaluates + saves XGBoost model
-│   ├── city_coordinates.py      # lat/lon centroids for CPCB cities (satellite queries need a point)
-│   ├── satellite_features.py    # MODIS AOD + Sentinel-5P NO2/CO -> AQI predictors (live or simulated)
-│   ├── fetch_satellite_features.py  # CLI: builds data/satellite_features.csv once
-│   └── hcho_hotspots.py         # Sentinel-5P HCHO: single-period map + biomass-burning anomaly detection
-└── models/                     # created by train_model.py: aqi_model.pkl,
-                                 # encoders.pkl, metrics.json, feature_importance.json
+AQI2/
+├── app.py                           # Home page (Streamlit entry point)
+├── requirements.txt                 # All dependencies
+├── .env                             # EE_PROJECT, API keys (git-ignored)
+│
+├── pages/                           # Streamlit multi-page app
+│   ├── 1_🗺️_India_AQI_Map.py       # Satellite AQI heatmap over India
+│   ├── 2_🔮_AQI_Prediction.py      # Per-city AQI prediction + SHAP + Forecast
+│   ├── 3_🌡️_HCHO_Hotspots.py      # HCHO hotspot detection & ranking
+│   ├── 4_🔥_Biomass_Burning.py     # NASA FIRMS fire + HCHO overlay
+│   ├── 5_📈_Trend_Analysis.py      # Temporal trend & seasonality
+│   ├── 6_✅_Validation.py          # Model vs CPCB ground-truth
+│   ├── 7_📊_Analytics.py           # Correlation matrix & statistics
+│   ├── 8_🏆_State_Rankings.py      # State-level rankings
+│   ├── 9_📄_Report.py              # PDF report generator
+│   └── 10_ℹ️_About.py             # About page / system docs
+│
+├── src/                             # Backend Python modules
+│   ├── aqi_utils.py                 # CPCB AQI category/color helpers
+│   ├── city_coordinates.py          # City → (lat, lon) lookup
+│   ├── data_preprocessing.py        # CSV loading, cleaning, imputation
+│   ├── feature_engineering.py       # Feature matrix builder
+│   ├── satellite_features.py        # GEE: MODIS AOD + S5P NO2/CO
+│   ├── hcho_hotspots.py             # GEE: HCHO + burning anomaly
+│   ├── multi_model.py               # Multi-model GBDT training
+│   ├── shap_explainer.py            # SHAP TreeExplainer wrappers
+│   ├── firms_fire.py                # NASA FIRMS active fire
+│   ├── health_advisory.py           # Detailed health advisories
+│   ├── state_rankings.py            # State aggregation & rankings
+│   ├── report_generator.py          # PDF generation via fpdf2
+│   ├── forecasting.py               # Autoregressive GBDT forecasting
+│   ├── train_model.py               # Single-model GBDT trainer
+│   ├── train_satellite_aqi_model.py # Satellite-only model trainer
+│   └── fetch_satellite_features.py  # GEE feature fetch script
+│
+├── data/                            # CPCB Ground data & fetched features
+└── models/                          # Trained model checkpoints
 ```
 
-## Setup
+---
 
-```bash
-cd aqi_project
-python3 -m venv venv && source venv/bin/activate     # optional but recommended
-pip install -r requirements.txt
+## 🛠️ Installation & Setup
 
-# 1. unzip your dataset into data/  (city_day.csv, city_hour.csv,
-#    station_day.csv, station_hour.csv, stations.csv)
+1. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-# 2. (optional but addresses the "surface AQI from satellite data" part
-#    of the problem statement) build satellite AOD/NO2/CO features --
-#    works with or without Earth Engine credentials (see below):
-python src/fetch_satellite_features.py
+2. **Download CPCB Ground Data**
+   Place `city_day.csv` and `stations.csv` (from the CPCB Kaggle/official dataset) in the `data/` directory.
 
-# 3. train the model (writes models/aqi_model.pkl etc.; automatically
-#    picks up data/satellite_features.csv if step 2 was run)
-python src/train_model.py
+3. **Train Models**
+   Run the multi-model GBDT training script:
+   ```bash
+   python src/multi_model.py
+   ```
+   This will train Random Forest, LightGBM, and CatBoost models, and save `best_model.pkl` along with validation data.
 
-# 4. launch the dashboard
-streamlit run app.py
-```
+4. **Train Satellite-only and Forecast Models**
+   ```bash
+   python src/train_satellite_aqi_model.py
+   python src/forecasting.py
+   ```
 
-I validated the full pipeline (`data_preprocessing.py` →
-`feature_engineering.py` → `train_model.py`) against your actual
-`archive__1_.zip` data in a sandbox: it cleaned 24,850 city-day rows
-with zero remaining NaNs and trained successfully
-(R² ≈ 0.90 on a held-out test set, using a GradientBoosting fallback
-since this sandbox has no internet access to install xgboost — your
-own environment should install `xgboost` per `requirements.txt` for
-the model the guide specifies).
+5. **Authenticate Google Earth Engine (Optional but Recommended)**
+   To pull live Sentinel-5P HCHO/pollutant maps and MODIS AOD:
+   ```bash
+   earthengine authenticate
+   ```
+   If using a modern billing-enabled Earth Engine project, configure `EE_PROJECT=your-project-id` in a `.env` file in the root directory.
+   *Without authentication, the platform runs in **simulated fallback mode** using deterministic, realistic spatial-temporal profiles.*
 
-## Bugs this implementation avoids (things a naive first pass hits on this exact dataset)
-
-1. **Data leakage** — `AQI_Bucket` is a deterministic function of `AQI`.
-   Using it as an input feature while predicting `AQI` leaks the
-   target. It's excluded from `X` entirely; category is only ever
-   derived *after* prediction, in `aqi_utils.aqi_to_category()`.
-2. **Losing 85%+ of rows to `dropna()`** — pollutant columns like
-   `Xylene`/`NH3` are missing in a large fraction of rows. Dropping any
-   row with a missing pollutant discards most of the dataset.
-   `data_preprocessing.py` instead imputes per-city medians (falling
-   back to the global median), and only drops rows missing the
-   **target** (`AQI`), since that can't be legitimately imputed.
-3. **`station_hour.csv` has no `City` column** — it only has
-   `StationId`. Concatenating it directly with `city_hour.csv` silently
-   produces an all-NaN City column for every station row.
-   `load_station_data()` joins `stations.csv` on `StationId` to recover
-   `City`/`State` correctly.
-4. **Negative pollutant readings** — sensor artifacts occasionally
-   report negative concentrations, which are physically impossible;
-   these are clipped to 0 before training.
-5. **Unencoded categoricals reused inconsistently at inference** — the
-   `LabelEncoder` for `City`/`StationId` is fit once during training and
-   saved (`models/encoders.pkl`); the dashboard reuses the *same*
-   encoder at inference time (with an unseen-category fallback) instead
-   of re-fitting, which would silently scramble the numeric mapping.
-6. **Overfitting from a fixed, large `n_estimators`** — `train_model.py`
-   uses an eval set + early stopping (when xgboost is available) rather
-   than a fixed tree count.
-7. **Re-loading 65–220MB CSVs on every Streamlit interaction** —
-   Streamlit reruns the whole script on every widget interaction;
-   without `@st.cache_data`/`@st.cache_resource` the dashboard would
-   reload and re-clean the full dataset every click. Both are applied
-   in `app.py`.
-
-## Satellite data: surface AQI predictors + HCHO hotspots
-
-Two things needed real satellite data wired in, not just ground-station
-data, to actually match the problem statement:
-
-### 1. Satellite-derived AQI predictors (AOD, NO2, CO)
-
-`src/satellite_features.py` pulls MODIS AOD (`MODIS/061/MCD19A2_GRANULES`)
-and Sentinel-5P NO2/CO column densities via Earth Engine for each CPCB
-city (`src/city_coordinates.py` gives each city a lat/lon centroid, since
-the CPCB CSVs only have city names). These become extra model features
-(`satellite_aod`, `satellite_no2`, `satellite_co`) — this is what lets the
-model generalize beyond ground-monitored cities, since a grid point
-anywhere in India has satellite coverage even where it has no CPCB station.
-
-```bash
-pip install earthengine-api
-earthengine authenticate                 # one-time; or set
-# export EE_SERVICE_ACCOUNT=...@...iam.gserviceaccount.com
-# export EE_SERVICE_ACCOUNT_KEY=/path/to/key.json
-
-python src/fetch_satellite_features.py    # writes data/satellite_features.csv
-python src/train_model.py                 # auto-merges it in if present
-```
-
-Without Earth Engine installed/authenticated, `fetch_satellite_features.py`
-still runs and writes `data/satellite_features.csv`, but with clearly
-labeled *simulated* values (`_source` column says `simulated` vs `live`) so
-the training/merge pipeline can be demoed end-to-end even without
-credentials. **Re-run the script after authenticating** to replace those
-with real pixels — nothing else needs to change.
-`models/metrics.json` records `used_satellite_features: true/false`, and
-the dashboard's Model Performance page surfaces this.
-
-### 2. HCHO hotspots — single-period map + biomass-burning anomaly detection
-
-The **HCHO Hotspot Map** page (`src/hcho_hotspots.py`) now has two views:
-
-- **Single-period hotspot map** — mean Sentinel-5P HCHO over a chosen date
-  range, same idea as before but wired to real data when Earth Engine is
-  available.
-- **Biomass-burning anomaly map** — the actual spatio-temporal ask in the
-  problem statement: for a grid of points over India, it compares each
-  point's mean HCHO during known burning months (default: Oct/Nov
-  post-monsoon stubble burning) against that *same point's* baseline
-  (non-burning months), and flags points with a z-score above a threshold.
-  This distinguishes a genuine burning-linked hotspot from a
-  permanently-elevated urban/industrial pixel.
-
-Both views auto-detect Earth Engine: live if authenticated (same setup as
-above), otherwise a clearly-labeled simulated grid with a realistic
-Indo-Gangetic-Plain Oct/Nov bump baked in, so the anomaly logic and UI can
-still be demoed without credentials. Re-authenticate and relaunch — no
-code changes needed to switch to live data.
-
-### Notes / things to check before presenting
-
-- **city_coordinates.py has city centroids, not exact CPCB station
-  coordinates** — fine for a 25km satellite sampling buffer, but say so if
-  asked; add real station lat/lon if you have it for tighter accuracy.
-- **The Oct/Nov default burning window is a starting point, not a fixed
-  truth** — it's editable in the dashboard (`multiselect`), and you may
-  want to add the Apr/May pre-monsoon window for certain regions/years.
-- **`get_hcho_grid_timeseries` samples a 22×22 grid** (`india_grid()`),
-  not a full-resolution raster — enough to show the pattern in a
-  dashboard; increase `n_lat`/`n_lon` for a finer map if Earth Engine
-  quota allows.
-
-## Notes on `station_hour.csv`
-
-At 220MB, loading the full hourly station file directly with
-`pd.read_csv` works but is slow. `train_model.py` trains on
-`city_day.csv` by default (fast, ~25k rows). To train on hourly/station
-granularity, call `train(data_dir, granularity="hour")` — consider
-adding `nrows=` or chunked reading in `data_preprocessing.py` if memory
-is constrained.
+6. **Launch the Dashboard**
+   ```bash
+   streamlit run app.py
+   ```

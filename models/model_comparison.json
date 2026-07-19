@@ -1,0 +1,55 @@
+{
+  "best_model": "LightGBM",
+  "best_rmse": 39.72338233244925,
+  "feature_columns": [
+    "PM2.5",
+    "PM10",
+    "NO",
+    "NO2",
+    "NOx",
+    "NH3",
+    "CO",
+    "SO2",
+    "O3",
+    "Benzene",
+    "Toluene",
+    "Xylene",
+    "Year",
+    "Month",
+    "Day",
+    "satellite_aod",
+    "satellite_no2",
+    "satellite_co",
+    "City_enc"
+  ],
+  "comparison": [
+    {
+      "model": "Random Forest",
+      "MAE": 20.766133966184753,
+      "RMSE": 40.40880686326876,
+      "R2": 0.9108257449047735,
+      "MAPE": 13.911173361609826,
+      "n_train": 19880,
+      "n_test": 4970
+    },
+    {
+      "model": "LightGBM",
+      "MAE": 20.332815385739178,
+      "RMSE": 39.72338233244925,
+      "R2": 0.9138252809600531,
+      "MAPE": 13.246598772686394,
+      "n_train": 19880,
+      "n_test": 4970,
+      "used_satellite_features": true
+    },
+    {
+      "model": "CatBoost",
+      "MAE": 21.560856759961972,
+      "RMSE": 41.268378068375945,
+      "R2": 0.9069915864675079,
+      "MAPE": 14.853466372099518,
+      "n_train": 19880,
+      "n_test": 4970
+    }
+  ]
+}

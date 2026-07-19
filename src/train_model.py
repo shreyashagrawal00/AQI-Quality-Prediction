@@ -31,6 +31,14 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
+
+def _mape(y_true, y_pred) -> float:
+    import numpy as np
+    mask = y_true != 0
+    if not mask.any():
+        return float("nan")
+    return float(np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100)
+
 import sys
 sys.path.insert(0, os.path.dirname(__file__))
 from data_preprocessing import load_city_data, add_time_features, attach_satellite_features
@@ -96,16 +104,24 @@ def train(data_dir: str, granularity: str = "day"):
 
     preds = model.predict(X_test)
     metrics = {
-        "MAE": float(mean_absolute_error(y_test, preds)),
+        "MAE":  float(mean_absolute_error(y_test, preds)),
         "RMSE": float(np.sqrt(mean_squared_error(y_test, preds))),
-        "R2": float(r2_score(y_test, preds)),
+        "R2":   float(r2_score(y_test, preds)),
+        "MAPE": _mape(np.array(y_test), np.array(preds)),
         "n_train": int(len(X_train)),
-        "n_test": int(len(X_test)),
+        "n_test":  int(len(X_test)),
         "model": "XGBRegressor" if _HAS_XGB else "GradientBoostingRegressor",
         "used_satellite_features": bool(set(X.columns) & {
             "satellite_aod", "satellite_no2", "satellite_co"
         }),
     }
+
+    # Save validation arrays for the Validation page
+    np.savez(
+        os.path.join(MODEL_DIR, "validation_data.npz"),
+        y_test=np.array(y_test),
+        y_pred=np.array(preds),
+    )
 
     importances = dict(zip(X.columns, model.feature_importances_.tolist()))
     importances = dict(sorted(importances.items(), key=lambda kv: -kv[1]))

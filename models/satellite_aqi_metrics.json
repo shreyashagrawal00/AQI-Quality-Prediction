@@ -1,10 +1,10 @@
 {
-  "MAE": 83.2501466341261,
-  "RMSE": 122.29368921181545,
-  "R2": -0.044646793111896343,
+  "MAE": 78.26274462243562,
+  "RMSE": 116.78004994439826,
+  "R2": 0.047426060882698406,
   "n_train": 728,
   "n_test": 183,
-  "model": "XGBRegressor",
+  "model": "GradientBoostingRegressor",
   "features": [
     "satellite_aod",
     "satellite_no2",
