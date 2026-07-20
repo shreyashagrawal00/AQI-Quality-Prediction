@@ -37,33 +37,33 @@ The following diagram illustrates the flow of data from remote sensing and groun
 flowchart TD
     %% Data Sources
     subgraph Data Sources [Data Sources]
-        A1[Sentinel-5P TROPOMI<br>tropospheric NO2, CO, HCHO]
-        A2[MODIS Aqua/Terra<br>Optical Depth AOD]
-        A3[NASA FIRMS API<br>Active Fire Brightness & FRP]
-        A4[CPCB Ground Stations<br>PM2.5, PM10, SO2, O3, NO2, CO]
+        A1["Sentinel-5P TROPOMI<br>tropospheric NO2, CO, HCHO"]
+        A2["MODIS Aqua/Terra<br>Optical Depth AOD"]
+        A3["NASA FIRMS API<br>Active Fire Brightness & FRP"]
+        A4["CPCB Ground Stations<br>PM2.5, PM10, SO2, O3, NO2, CO"]
     end
 
     %% GEE Extraction
     subgraph GEE [Google Earth Engine Cloud]
-        B1[Buffer Regions & Spatial Grid]
-        B2[Image Collection Reducers]
+        B1["Buffer Regions & Spatial Grid"]
+        B2["Image Collection Reducers"]
     end
 
     %% Preprocessing
     subgraph Pipeline [Data Engineering & Modeling]
-        C1[City Median Imputation &<br>Negative Value Clipping]
-        C2[Feature Matrix Builder<br>Label Encoders]
-        C3[Multi-Model GBDT Ensemble<br>RF | XGBoost | LightGBM | CatBoost]
-        C4[Satellite-Only AQI Model<br>GBDT on AOD/NO2/CO]
-        C5[Autoregressive Lag Model<br>lag_1 to lag_7 + Calendar Features]
+        C1["City Median Imputation &<br>Negative Value Clipping"]
+        C2["Feature Matrix Builder<br>Label Encoders"]
+        C3["Multi-Model GBDT Ensemble<br>RF | XGBoost | LightGBM | CatBoost"]
+        C4["Satellite-Only AQI Model<br>GBDT on AOD/NO2/CO"]
+        C5["Autoregressive Lag Model<br>lag_1 to lag_7 + Calendar Features"]
     end
 
     %% Outputs & UI
     subgraph UI [Interactive Dashboard]
-        D1[Streamlit Multi-page App]
-        D2[Plotly & Mapbox Visuals]
-        D3[SHAP Explainable AI Plots]
-        D4[Automatic PDF Exporter<br>FPDF2 & Kaleido]
+        D1["Streamlit Multi-page App"]
+        D2["Plotly & Mapbox Visuals"]
+        D3["SHAP Explainable AI Plots"]
+        D4["Automatic PDF Exporter<br>FPDF2 & Kaleido"]
     end
 
     %% Connections
