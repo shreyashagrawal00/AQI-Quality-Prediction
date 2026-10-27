@@ -56,8 +56,8 @@ except ImportError:
 try:
     import streamlit as st
     for _key in ("EE_PROJECT", "EE_SERVICE_ACCOUNT", "EE_SERVICE_ACCOUNT_KEY", "FIRMS_MAP_KEY"):
-        if _key in st.secrets and _key not in os.environ:
-            os.environ[_key] = st.secrets[_key]
+        if _key in st.secrets and not os.environ.get(_key):
+            os.environ[_key] = str(st.secrets[_key])
 except Exception:
     pass  # Not running in Streamlit, or secrets not configured -- that's fine
 
@@ -92,7 +92,18 @@ def init_earth_engine() -> bool:
         project = os.environ.get("EE_PROJECT")  # required by Earth Engine since late 2024
 
         if service_account and key_path:
-            credentials = ee.ServiceAccountCredentials(service_account, key_path)
+            # key_path can be either a file path OR raw JSON content (for cloud deployments)
+            import json as _json, tempfile as _tmp
+            try:
+                _json.loads(key_path)  # check if it's inline JSON
+                # Write to a temp file so ServiceAccountCredentials can read it
+                _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+                _tf.write(key_path)
+                _tf.flush()
+                credentials = ee.ServiceAccountCredentials(service_account, _tf.name)
+            except (_json.JSONDecodeError, ValueError):
+                # It's a file path
+                credentials = ee.ServiceAccountCredentials(service_account, key_path)
             ee.Initialize(credentials, project=project) if project else ee.Initialize(credentials)
         elif project:
             ee.Initialize(project=project)  # uses `earthengine authenticate` cached credentials
