@@ -111,7 +111,7 @@ m5.metric("Worst Category", worst_cat)
 tab1, tab2 = st.tabs(["🌡️ Density Heatmap", "📊 Scatter Map"])
 
 with tab1:
-    fig = go.Figure(data=go.Densitymapbox(
+    fig = go.Figure(data=go.Densitymap(
         lat=sat_grid["lat"], lon=sat_grid["lon"], z=sat_grid["predicted_aqi"],
         radius=20, colorscale="YlOrRd", zmin=0, zmax=400,
         colorbar=dict(
@@ -123,15 +123,15 @@ with tab1:
         hovertemplate="Lat: %{lat:.2f}<br>Lon: %{lon:.2f}<br>AQI: %{z:.0f}<extra></extra>",
     ))
     fig.update_layout(
-        mapbox_style=map_style,
-        mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
+        map_style=map_style,
+        map_center={"lat": 22, "lon": 82}, map_zoom=3.8,
         height=620, margin=dict(l=0, r=0, t=0, b=0),
         paper_bgcolor="rgba(0,0,0,0)",
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 with tab2:
-    fig2 = px.scatter_mapbox(
+    fig2 = px.scatter_map(
         sat_grid, lat="lat", lon="lon",
         color="predicted_aqi", size_max=8,
         color_continuous_scale="YlOrRd",
@@ -140,10 +140,10 @@ with tab2:
         height=620,
     )
     fig2.update_layout(
-        mapbox_style=map_style, margin=dict(l=0, r=0, t=0, b=0),
+        map_style=map_style, margin=dict(l=0, r=0, t=0, b=0),
         paper_bgcolor="rgba(0,0,0,0)",
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
 # ── AQI Distribution ──────────────────────────────────────────────────────────
 st.subheader("AQI Distribution across Grid")
@@ -157,7 +157,7 @@ fig3 = px.bar(cat_counts, x="Category", y="Count", color="Category",
               category_orders={"Category": cat_order})
 fig3.update_layout(showlegend=False, height=320,
                    **plotly_dark_layout())
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(fig3, width='stretch')
 
 # ── Download ───────────────────────────────────────────────────────────────────
 with st.expander("📥 Download Grid Data"):

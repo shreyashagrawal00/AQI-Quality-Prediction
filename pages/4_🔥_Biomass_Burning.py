@@ -98,7 +98,7 @@ with tab1:
         fig = go.Figure()
         # FRP-scaled markers
         max_frp = fire_df["frp"].max()
-        fig.add_trace(go.Scattermapbox(
+        fig.add_trace(go.Scattermap(
             lat=fire_df["latitude"],
             lon=fire_df["longitude"],
             mode="markers",
@@ -115,14 +115,14 @@ with tab1:
             name="Fire Points",
         ))
         fig.update_layout(
-            mapbox_style="carto-darkmatter",
-            mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
+            map_style="carto-darkmatter",
+            map_center={"lat": 22, "lon": 82}, map_zoom=3.8,
             height=580, margin=dict(l=0,r=0,t=30,b=0),
             paper_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e2e8f0"),
             title=f"Active Fire Detections ({days_back}-day window)",
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
 with tab2:
     st.markdown(
@@ -149,7 +149,7 @@ with tab2:
 
     fig2 = go.Figure()
     # HCHO base layer
-    fig2.add_trace(go.Densitymapbox(
+    fig2.add_trace(go.Densitymap(
         lat=hcho_month_df["lat"], lon=hcho_month_df["lon"],
         z=hcho_month_df["hcho"],
         radius=18, colorscale="YlOrRd", opacity=0.45,
@@ -157,7 +157,7 @@ with tab2:
     ))
     # fire points
     if len(fire_df) > 0:
-        fig2.add_trace(go.Scattermapbox(
+        fig2.add_trace(go.Scattermap(
             lat=fire_df["latitude"], lon=fire_df["longitude"],
             mode="markers",
             marker=dict(size=7, color="orange", opacity=0.7),
@@ -166,15 +166,15 @@ with tab2:
     # combined hotspots
     combo = grid_density[grid_density["combined_hotspot"]]
     if len(combo) > 0:
-        fig2.add_trace(go.Scattermapbox(
+        fig2.add_trace(go.Scattermap(
             lat=combo["lat"], lon=combo["lon"],
             mode="markers",
             marker=dict(size=14, color="red", symbol="circle", opacity=0.9),
             name="🔴 HCHO + Fire Hotspot",
         ))
     fig2.update_layout(
-        mapbox_style="carto-darkmatter",
-        mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
+        map_style="carto-darkmatter",
+        map_center={"lat": 22, "lon": 82}, map_zoom=3.8,
         height=580, margin=dict(l=0,r=0,t=30,b=0),
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01,
                     bgcolor="rgba(26,26,46,0.9)", bordercolor="#2d2d44", font=dict(color="#e2e8f0")),
@@ -182,7 +182,7 @@ with tab2:
         font=dict(color="#e2e8f0"),
         title="Biomass Burning Hotspot: High HCHO + Active Fire",
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
 with tab3:
     if len(fire_df) > 0:
@@ -193,7 +193,7 @@ with tab3:
                                  title="Fire Radiative Power (FRP) Distribution",
                                  color_discrete_sequence=["#f97316"])
             fig3a.update_layout(height=300, **plotly_dark_layout())
-            st.plotly_chart(fig3a, use_container_width=True)
+            st.plotly_chart(fig3a, width='stretch')
 
         with col2:
             # confidence breakdown
@@ -203,7 +203,7 @@ with tab3:
                            title="Fire Detection Confidence",
                            color_discrete_sequence=px.colors.sequential.Oranges)
             fig3b.update_layout(height=300, **plotly_dark_layout())
-            st.plotly_chart(fig3b, use_container_width=True)
+            st.plotly_chart(fig3b, width='stretch')
 
         # Daily fire count
         fire_df_copy = fire_df.copy()
@@ -213,7 +213,7 @@ with tab3:
                        title="Daily Active Fire Count",
                        color_discrete_sequence=["#ef4444"])
         fig3c.update_layout(height=280, **plotly_dark_layout())
-        st.plotly_chart(fig3c, use_container_width=True)
+        st.plotly_chart(fig3c, width='stretch')
 
 with tab4:
     if len(fire_df) == 0:

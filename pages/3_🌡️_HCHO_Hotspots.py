@@ -88,21 +88,21 @@ with tab1:
         c3.metric("Min HCHO",  f"{plot_df['value'].min():.3f}")
         c4.metric("Std Dev",   f"{plot_df['value'].std():.3f}")
 
-        fig = go.Figure(go.Densitymapbox(
+        fig = go.Figure(go.Densitymap(
             lat=plot_df["lat"], lon=plot_df["lon"], z=plot_df["value"],
             radius=22, colorscale="YlOrRd",
             colorbar_title="HCHO (×10¹⁶ molec/cm²)",
             hovertemplate="Lat: %{lat:.2f}<br>Lon: %{lon:.2f}<br>HCHO: %{z:.3f}<extra></extra>",
         ))
         fig.update_layout(
-            mapbox_style="carto-darkmatter",
-            mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
+            map_style="carto-darkmatter",
+            map_center={"lat": 22, "lon": 82}, map_zoom=3.8,
             height=580, margin=dict(l=0,r=0,t=30,b=0),
             paper_bgcolor="rgba(0,0,0,0)",
             title=f"HCHO Column Density — {pd.Timestamp(2000, month_sel, 1).strftime('%B')} {year}",
             title_font=dict(color="#e2e8f0"),
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 2: Burning Anomaly Map
@@ -138,7 +138,7 @@ with tab2:
     hot     = anomalies[anomalies["is_hotspot"]]
 
     fig2 = go.Figure()
-    fig2.add_trace(go.Scattermapbox(
+    fig2.add_trace(go.Scattermap(
         lat=non_hot["lat"], lon=non_hot["lon"],
         mode="markers",
         marker=dict(size=6, color=non_hot["z_score"], colorscale="Blues",
@@ -147,7 +147,7 @@ with tab2:
         name="Normal",
         hovertemplate="z=%.2f<extra>Normal</extra>",
     ))
-    fig2.add_trace(go.Scattermapbox(
+    fig2.add_trace(go.Scattermap(
         lat=hot["lat"], lon=hot["lon"],
         mode="markers",
         marker=dict(size=12, color="red", opacity=0.85, symbol="circle"),
@@ -155,8 +155,8 @@ with tab2:
         hovertemplate="z=%.2f<extra>Hotspot</extra>",
     ))
     fig2.update_layout(
-        mapbox_style="carto-darkmatter",
-        mapbox_center={"lat": 22, "lon": 82}, mapbox_zoom=3.8,
+        map_style="carto-darkmatter",
+        map_center={"lat": 22, "lon": 82}, map_zoom=3.8,
         height=580, margin=dict(l=0,r=0,t=30,b=0),
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01,
                     bgcolor="rgba(26,26,46,0.9)", bordercolor="#2d2d44"),
@@ -164,7 +164,7 @@ with tab2:
         title=f"Biomass-Burning HCHO Anomalies — {year}",
         title_font=dict(color="#e2e8f0"),
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
     with st.expander("📋 Top Hotspot Grid Points"):
         st.dataframe(
@@ -196,7 +196,7 @@ with tab3:
         height=500,
     )
     fig3.update_layout(**plotly_dark_layout())
-    st.plotly_chart(fig3, use_container_width=True)
+    st.plotly_chart(fig3, width='stretch')
     st.dataframe(state_rank, use_container_width=True, hide_index=True)
 
 # ─────────────────────────────────────────────────────────────────────────────

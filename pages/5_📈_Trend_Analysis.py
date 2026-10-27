@@ -90,7 +90,7 @@ with tab1:
             height=450,
             **plotly_dark_layout(),
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
         # Rolling average option
         show_roll = st.checkbox("Show 30-day rolling average")
@@ -103,7 +103,7 @@ with tab1:
             fig2.add_trace(go.Scatter(x=nat_trend2["Date"], y=nat_trend2["rolling"],
                                       mode="lines", line=dict(color="#1d4ed8", width=2.5), name="30-day avg"))
             fig2.update_layout(height=300, **plotly_dark_layout())
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width='stretch')
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 2: Monthly Seasonality
@@ -130,7 +130,7 @@ with tab2:
         height=400,
         **plotly_dark_layout(),
     )
-    st.plotly_chart(fig_m, use_container_width=True)
+    st.plotly_chart(fig_m, width='stretch')
 
     # Season box plot
     df_f["Season"] = df_f["Month"].map({
@@ -145,7 +145,7 @@ with tab2:
                    category_orders={"Season": ["Winter","Pre-Monsoon","Monsoon","Post-Monsoon"]},
                    color_discrete_sequence=["#3b82f6","#f59e0b","#10b981","#ef4444"])
     fig_s.update_layout(height=380, **plotly_dark_layout(showlegend=False))
-    st.plotly_chart(fig_s, use_container_width=True)
+    st.plotly_chart(fig_s, width='stretch')
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 3: Yearly Trend
@@ -171,7 +171,7 @@ with tab3:
         height=420,
         **plotly_dark_layout(),
     )
-    st.plotly_chart(fig_y, use_container_width=True)
+    st.plotly_chart(fig_y, width='stretch')
     st.dataframe(yearly.set_index("Year").style.background_gradient(subset=["mean"], cmap="YlOrRd"),
                  use_container_width=True)
 
@@ -203,7 +203,7 @@ with tab4:
             height=400,
             **plotly_dark_layout(),
         )
-        st.plotly_chart(fig_cmp, use_container_width=True)
+        st.plotly_chart(fig_cmp, width='stretch')
 
         # delta table
         merged_cmp = df_a.merge(df_b, on="Month_Name", suffixes=(f"_{yr_a}", f"_{yr_b}"))
@@ -232,7 +232,7 @@ with tab5:
         coords_df = pd.DataFrame(coords_list)
         anim_df = monthly_city.merge(coords_df, on="City", how="inner")
         if len(anim_df) > 0:
-            fig_anim = px.scatter_mapbox(
+            fig_anim = px.scatter_map(
                 anim_df, lat="lat", lon="lon",
                 color=pollutant, size=pollutant,
                 animation_frame="Period",
@@ -243,8 +243,8 @@ with tab5:
                 height=550,
                 title=f"Animated {pollutant} by City",
             )
-            fig_anim.update_layout(mapbox_style="carto-positron", margin=dict(l=0,r=0,t=40,b=0))
-            st.plotly_chart(fig_anim, use_container_width=True)
+            fig_anim.update_layout(map_style="carto-positron", margin=dict(l=0,r=0,t=40,b=0))
+            st.plotly_chart(fig_anim, width='stretch')
         else:
             st.info("No coordinate data available for animation.")
     except Exception as e:

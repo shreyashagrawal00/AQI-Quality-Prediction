@@ -105,7 +105,7 @@ if incl_trend:
                         title=f"Monthly Mean AQI — {year_sel}",
                         color_discrete_sequence=["#3b82f6"])
     fig_trend.update_layout(**plotly_dark_layout(height=350))
-    st.plotly_chart(fig_trend, use_container_width=True)
+    st.plotly_chart(fig_trend, width='stretch')
     figs_for_report.append((fig_trend, f"Monthly Mean AQI — {year_sel}"))
 
 if incl_city:
@@ -114,7 +114,7 @@ if incl_city:
                       color="AQI", color_continuous_scale="YlOrRd",
                       title=f"Top 15 Most Polluted Cities — {year_sel}", height=400)
     fig_city.update_layout(**plotly_dark_layout())
-    st.plotly_chart(fig_city, use_container_width=True)
+    st.plotly_chart(fig_city, width='stretch')
     figs_for_report.append((fig_city, f"Top 15 Polluted Cities — {year_sel}"))
 
 if incl_state:
@@ -124,7 +124,7 @@ if incl_state:
                            color="AQI_mean", color_continuous_scale="YlOrRd",
                            title=f"States by Mean AQI — {year_sel}", height=400)
         fig_state.update_layout(**plotly_dark_layout())
-        st.plotly_chart(fig_state, use_container_width=True)
+        st.plotly_chart(fig_state, width='stretch')
         figs_for_report.append((fig_state, f"State AQI Rankings — {year_sel}"))
 
 tables_for_report = []

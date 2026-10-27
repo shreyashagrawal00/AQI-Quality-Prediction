@@ -95,7 +95,7 @@ with tab1:
         height=max(350, top_n * 28),
     )
     fig1.update_layout(**plotly_dark_layout(height=max(350, top_n * 28)))
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, width='stretch')
     st.dataframe(worst.style.background_gradient(subset=["AQI_mean"], cmap="YlOrRd"),
                  use_container_width=True, hide_index=True)
 
@@ -115,7 +115,7 @@ with tab2:
         height=450,
     )
     fig2.update_layout(**plotly_dark_layout(height=450))
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
     st.dataframe(cleanest, use_container_width=True, hide_index=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ with tab3:
         height=450,
     )
     fig3.update_layout(**plotly_dark_layout(height=450))
-    st.plotly_chart(fig3, use_container_width=True)
+    st.plotly_chart(fig3, width='stretch')
     st.dataframe(hcho_rank, use_container_width=True, hide_index=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -161,7 +161,7 @@ with tab4:
             height=420,
         )
         fig4a.update_layout(**plotly_dark_layout(height=420))
-        st.plotly_chart(fig4a, use_container_width=True)
+        st.plotly_chart(fig4a, width='stretch')
 
         fig4b = px.bar(
             fire_rank, x="total_frp", y="State", orientation="h",
@@ -171,7 +171,7 @@ with tab4:
             height=420,
         )
         fig4b.update_layout(**plotly_dark_layout(height=420))
-        st.plotly_chart(fig4b, use_container_width=True)
+        st.plotly_chart(fig4b, width='stretch')
         st.dataframe(fire_rank, use_container_width=True, hide_index=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -195,5 +195,5 @@ with tab5:
             height=450,
         )
         fig5.update_layout(**plotly_dark_layout(height=450))
-        st.plotly_chart(fig5, use_container_width=True)
+        st.plotly_chart(fig5, width='stretch')
         st.dataframe(improved, use_container_width=True, hide_index=True)

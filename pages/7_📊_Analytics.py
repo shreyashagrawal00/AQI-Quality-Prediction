@@ -60,7 +60,7 @@ with tab1:
         fig1.update_layout(height=600, margin=dict(l=0, r=0, t=40, b=0),
                            paper_bgcolor="rgba(0,0,0,0)",
                            font=dict(color="#e2e8f0"))
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, width='stretch')
 
         # Top correlations with AQI
         if "AQI" in sel_cols:
@@ -79,7 +79,7 @@ with tab1:
             )
             fig_bar.add_hline(y=0, line_dash="dash", line_color="#374151")
             fig_bar.update_layout(height=350, plot_bgcolor="rgba(0,0,0,0)")
-            st.plotly_chart(fig_bar, use_container_width=True)
+            st.plotly_chart(fig_bar, width='stretch')
             st.dataframe(aqi_corr, use_container_width=True, hide_index=True)
     else:
         st.info("Select at least 2 columns.")
@@ -105,7 +105,7 @@ with tab2:
         height=480,
     )
     fig2.update_layout(**plotly_dark_layout())
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
     # Pearson for this pair
     r = df[[x_col, y_col]].dropna().corr().iloc[0, 1]
@@ -127,7 +127,7 @@ with tab2:
                                color_discrete_sequence=["#3b82f6"])
             fig_q.update_layout(height=280, margin=dict(l=10,r=10,t=40,b=10),
                                 **plotly_dark_layout())
-            cols_q[j].plotly_chart(fig_q, use_container_width=True)
+            cols_q[j].plotly_chart(fig_q, width='stretch')
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 3: Scientific Statistics
@@ -151,7 +151,7 @@ with tab3:
                          color="Pollutant", title="Pollutant Distributions",
                          color_discrete_sequence=px.colors.qualitative.Set2)
         fig3.update_layout(height=450, showlegend=False, **plotly_dark_layout())
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, width='stretch')
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 4: Feature Importance
@@ -173,7 +173,7 @@ with tab4:
                       text=imp_df.tail(20)["Importance %"].apply(lambda v: f"{v:.1f}%"),
                       height=550)
         fig4.update_layout(**plotly_dark_layout())
-        st.plotly_chart(fig4, use_container_width=True)
+        st.plotly_chart(fig4, width='stretch')
 
         st.dataframe(imp_df.sort_values("Importance", ascending=False), use_container_width=True, hide_index=True)
     else:

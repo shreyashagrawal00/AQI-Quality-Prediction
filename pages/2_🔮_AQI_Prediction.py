@@ -215,7 +215,7 @@ if predict_btn:
             paper_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e2e8f0"),
         )
-        st.plotly_chart(fig_gauge, use_container_width=True)
+        st.plotly_chart(fig_gauge, width='stretch')
 
     # ── SHAP Explainability ───────────────────────────────────────────────────
     with s_col:
@@ -242,7 +242,7 @@ if predict_btn:
                         legend=dict(orientation="h", y=-0.2, bgcolor="rgba(26,26,46,0.9)", bordercolor="#2d2d44"),
                     )
                 )
-                st.plotly_chart(fig_shap, use_container_width=True)
+                st.plotly_chart(fig_shap, width='stretch')
             else:
                 st.warning("SHAP explanation unavailable for this model type.")
 
@@ -282,7 +282,7 @@ if predict_btn:
                 height=350,
                 **plotly_dark_layout(),
             )
-            st.plotly_chart(fig_fc, use_container_width=True)
+            st.plotly_chart(fig_fc, width='stretch')
         with c_fc2:
             st.markdown(f"**7-Day Forecast values for {city}:**")
             # Format dataframe for display

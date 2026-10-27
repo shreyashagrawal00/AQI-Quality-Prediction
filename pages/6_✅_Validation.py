@@ -116,7 +116,7 @@ with tab1:
         height=520,
         **plotly_dark_layout(),
     )
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, width='stretch')
 
     # within-n-AQI accuracy
     for tol in [25, 50, 75]:
@@ -140,7 +140,7 @@ with tab2:
         height=450,
         **plotly_dark_layout(),
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
 with tab3:
     col_a, col_b = st.columns(2)
@@ -152,7 +152,7 @@ with tab3:
         fig3a.add_vline(x=mae, line_dash="dash", line_color="#ef4444",
                         annotation_text=f"MAE={mae:.1f}")
         fig3a.update_layout(height=350, showlegend=False, **plotly_dark_layout())
-        st.plotly_chart(fig3a, use_container_width=True)
+        st.plotly_chart(fig3a, width='stretch')
 
     with col_b:
         fig3b = px.histogram(residuals, nbins=50,
@@ -161,7 +161,7 @@ with tab3:
                              color_discrete_sequence=["#8b5cf6"])
         fig3b.add_vline(x=0, line_dash="dash", line_color="#64748b")
         fig3b.update_layout(height=350, showlegend=False, **plotly_dark_layout())
-        st.plotly_chart(fig3b, use_container_width=True)
+        st.plotly_chart(fig3b, width='stretch')
 
     # Scientific statistics
     st.subheader("Scientific Statistics (Errors)")
@@ -198,7 +198,7 @@ with tab4:
                           title="Model Comparison by RMSE",
                           text=cmp_df["RMSE"].round(2))
             fig4.update_layout(height=350, **plotly_dark_layout())
-            st.plotly_chart(fig4, use_container_width=True)
+            st.plotly_chart(fig4, width='stretch')
     else:
         st.info("Run `python src/multi_model.py` for multi-model comparison.")
 
@@ -218,5 +218,5 @@ with tab5:
                   text=cat_err_grp["Mean Abs Error"].round(1),
                   title="Mean Absolute Error by AQI Category")
     fig5.update_layout(height=380, **plotly_dark_layout())
-    st.plotly_chart(fig5, use_container_width=True)
+    st.plotly_chart(fig5, width='stretch')
     st.dataframe(cat_err_grp, use_container_width=True, hide_index=True)

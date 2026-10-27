@@ -182,7 +182,7 @@ with tab1:
                       annotation_text=label, annotation_position="right",
                       annotation_font_color="#64748b")
     fig.update_traces(line_width=2.5)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 with tab2:
     city_avg = (
@@ -197,7 +197,7 @@ with tab2:
     )
     fig2.update_layout(**plotly_dark_layout())
     fig2.update_coloraxes(colorbar_title="AQI")
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width='stretch')
 
 with tab3:
     st.markdown(
